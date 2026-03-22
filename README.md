@@ -1,6 +1,6 @@
 # Voxelerate
 
-**Voxelerate** is a GPU-first toolkit for loading, visualizing, voxelizing, and serializing 3D triangle meshes.
+**Voxelerate** is a GPU-accelerated toolkit for loading, visualizing, voxelizing, and serializing 3D triangle meshes.
 It is designed for workflows where a mesh must be inspected in 3D, converted into a dense voxel volume, optionally
 accelerated with BVH or octree structures, and saved for reuse in later pipelines such as volumetric 3D printing,
 simulation, geometry processing, or analysis.
