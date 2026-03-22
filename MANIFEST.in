@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+recursive-include docs *
+recursive-include examples *
+recursive-include models *
+recursive-include src/voxelerate/shaders *

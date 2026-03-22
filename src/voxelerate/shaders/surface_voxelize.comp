@@ -1,0 +1,101 @@
+#version 430
+
+// Portions of the voxelization logic in this shader were inspired by
+// the cuda_voxelizer project by Forceflow:
+// https://github.com/Forceflow/cuda_voxelizer
+
+
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout (binding = 0) buffer TriangleData {
+    float triangle_data[];
+};
+
+layout (r32ui, binding = 1) uniform uimage3D voxel_texture;
+
+uniform vec3 unit;
+uniform vec3 bbox_min;
+uniform ivec3 grid_size;
+uniform int n_triangles;
+
+void main() {
+    uint thread_id = gl_GlobalInvocationID.x;
+    uint stride = gl_WorkGroupSize.x * gl_NumWorkGroups.x;
+
+    while (thread_id < uint(n_triangles)) {
+        uint t = thread_id * 9u;
+
+        vec3 v0 = vec3(triangle_data[t],     triangle_data[t + 1], triangle_data[t + 2]) - bbox_min;
+        vec3 v1 = vec3(triangle_data[t + 3], triangle_data[t + 4], triangle_data[t + 5]) - bbox_min;
+        vec3 v2 = vec3(triangle_data[t + 6], triangle_data[t + 7], triangle_data[t + 8]) - bbox_min;
+
+        vec3 e0 = v1 - v0;
+        vec3 e1 = v2 - v1;
+        vec3 e2 = v0 - v2;
+        vec3 n = normalize(cross(e0, e1));
+
+        vec3 t_bbox_world_min = min(v0, min(v1, v2));
+        vec3 t_bbox_world_max = max(v0, max(v1, v2));
+
+        ivec3 t_bbox_grid_min = ivec3(clamp(floor(t_bbox_world_min / unit), vec3(0.0), vec3(grid_size - 1)));
+        ivec3 t_bbox_grid_max = ivec3(clamp(ceil(t_bbox_world_max / unit), vec3(0.0), vec3(grid_size - 1)));
+
+        vec3 c = unit * vec3(max(0.0, sign(n.x)), max(0.0, sign(n.y)), max(0.0, sign(n.z)));
+        float d1 = dot(n, c - v0);
+        float d2 = dot(n, (unit - c) - v0);
+
+        vec2 n_xy_e0 = sign(n.z) * vec2(-e0.y, e0.x);
+        vec2 n_xy_e1 = sign(n.z) * vec2(-e1.y, e1.x);
+        vec2 n_xy_e2 = sign(n.z) * vec2(-e2.y, e2.x);
+
+        float d_xy_e0 = -dot(n_xy_e0, vec2(v0.x, v0.y)) + max(0.0, unit.x * n_xy_e0.x) + max(0.0, unit.y * n_xy_e0.y);
+        float d_xy_e1 = -dot(n_xy_e1, vec2(v1.x, v1.y)) + max(0.0, unit.x * n_xy_e1.x) + max(0.0, unit.y * n_xy_e1.y);
+        float d_xy_e2 = -dot(n_xy_e2, vec2(v2.x, v2.y)) + max(0.0, unit.x * n_xy_e2.x) + max(0.0, unit.y * n_xy_e2.y);
+
+        vec2 n_yz_e0 = sign(n.x) * vec2(-e0.z, e0.y);
+        vec2 n_yz_e1 = sign(n.x) * vec2(-e1.z, e1.y);
+        vec2 n_yz_e2 = sign(n.x) * vec2(-e2.z, e2.y);
+
+        float d_yz_e0 = -dot(n_yz_e0, vec2(v0.y, v0.z)) + max(0.0, unit.y * n_yz_e0.x) + max(0.0, unit.z * n_yz_e0.y);
+        float d_yz_e1 = -dot(n_yz_e1, vec2(v1.y, v1.z)) + max(0.0, unit.y * n_yz_e1.x) + max(0.0, unit.z * n_yz_e1.y);
+        float d_yz_e2 = -dot(n_yz_e2, vec2(v2.y, v2.z)) + max(0.0, unit.y * n_yz_e2.x) + max(0.0, unit.z * n_yz_e2.y);
+
+        vec2 n_zx_e0 = sign(n.y) * vec2(-e0.x, e0.z);
+        vec2 n_zx_e1 = sign(n.y) * vec2(-e1.x, e1.z);
+        vec2 n_zx_e2 = sign(n.y) * vec2(-e2.x, e2.z);
+
+        float d_zx_e0 = -dot(n_zx_e0, vec2(v0.z, v0.x)) + max(0.0, unit.x * n_zx_e0.x) + max(0.0, unit.z * n_zx_e0.y);
+        float d_zx_e1 = -dot(n_zx_e1, vec2(v1.z, v1.x)) + max(0.0, unit.x * n_zx_e1.x) + max(0.0, unit.z * n_zx_e1.y);
+        float d_zx_e2 = -dot(n_zx_e2, vec2(v2.z, v2.x)) + max(0.0, unit.x * n_zx_e2.x) + max(0.0, unit.z * n_zx_e2.y);
+
+        for (int z = t_bbox_grid_min.z; z <= t_bbox_grid_max.z; ++z) {
+            for (int y = t_bbox_grid_min.y; y <= t_bbox_grid_max.y; ++y) {
+                for (int x = t_bbox_grid_min.x; x <= t_bbox_grid_max.x; ++x) {
+                    vec3 p = vec3(x, y, z) * unit;
+                    float n_dot_p = dot(n, p);
+
+                    if ((n_dot_p + d1) * (n_dot_p + d2) > 0.0) continue;
+
+                    vec2 p_xy = vec2(p.x, p.y);
+                    if ((dot(n_xy_e0, p_xy) + d_xy_e0) < -unit.x) continue;
+                    if ((dot(n_xy_e1, p_xy) + d_xy_e1) < -unit.x) continue;
+                    if ((dot(n_xy_e2, p_xy) + d_xy_e2) < -unit.x) continue;
+
+                    vec2 p_yz = vec2(p.y, p.z);
+                    if ((dot(n_yz_e0, p_yz) + d_yz_e0) < -unit.y) continue;
+                    if ((dot(n_yz_e1, p_yz) + d_yz_e1) < -unit.y) continue;
+                    if ((dot(n_yz_e2, p_yz) + d_yz_e2) < -unit.y) continue;
+
+                    vec2 p_zx = vec2(p.z, p.x);
+                    if ((dot(n_zx_e0, p_zx) + d_zx_e0) < -unit.z) continue;
+                    if ((dot(n_zx_e1, p_zx) + d_zx_e1) < -unit.z) continue;
+                    if ((dot(n_zx_e2, p_zx) + d_zx_e2) < -unit.z) continue;
+
+                    imageAtomicOr(voxel_texture, ivec3(x, y, z), 1u);
+                }
+            }
+        }
+
+        thread_id += stride;
+    }
+}
