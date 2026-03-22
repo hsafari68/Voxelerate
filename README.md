@@ -3,18 +3,18 @@
 **Voxelerate** is a GPU-accelerated toolkit for loading, visualizing, voxelizing, and serializing 3D triangle meshes.
 It is designed for workflows where a mesh must be inspected in 3D, converted into a dense voxel volume, optionally
 accelerated with BVH or octree structures, and saved for reuse in later pipelines such as volumetric 3D printing,
+
 simulation, geometry processing, or analysis.
 
+## Gallery
 
-## Project gallery
+### 3D viewer: mesh, voxel grid, BVH, and octree
 
-Interactive viewer snapshots showing the input mesh, solid voxelization, mesh octree, and BVH overlays:
+![Voxelerate 3D viewer overview](docs/assets/viewer_overview.png)
 
-![Voxelerate viewer panels](docs/assets/viewer_panels.png)
+### Central slice inspection with voxel-octree overlay
 
-Central solid-voxel slice inspection with voxel-octree overlay:
-
-![Voxelerate slice viewer](docs/assets/slice_viewer.png)
+![Voxelerate slice viewer overview](docs/assets/slice_overview.png)
 
 ## Overview
 
@@ -316,15 +316,14 @@ Voxelerate/
 ## Citation
 
 If you use Voxelerate in academic work, cite the software repository and the specific release or commit you used.
-Once the repository is published, replace the placeholder fields below with the final author names, repository URL,
-and release tag.
+A ready-to-use BibTeX entry is provided below and can be adjusted as the project evolves.
 
 ```bibtex
 @software{voxelerate,
   title   = {Voxelerate: GPU Mesh Visualization, Voxelization, and Spatial Hierarchies for 3D Geometry},
   author  = {hsafari68},
   year    = {2026},
-  version = {0.5.6},
+  version = {0.5.7},
   url     = {https://github.com/hsafari68/Voxelerate},
   note    = {Software repository. Cite the release or commit used in your work.}
 }
