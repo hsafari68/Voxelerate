@@ -139,16 +139,6 @@ Current viewer controls:
 Preview controls are **visual only**. They never change the voxelized result. To affect voxelization, pass an
 explicit transform matrix or translation / rotation / scale inputs into `voxelize(...)` or `voxelize_on_grid(...)`.
 
-## Why solid voxel previews can look sparser than surface previews
-
-For a closed watertight mesh, the stored solid voxel grid should normally contain at least as many occupied voxels
-as the surface grid, and usually many more. The confusing part is **preview occlusion**: when solid voxels are drawn
-as opaque depth-tested points, the outer shell hides most interior voxels, especially when the mesh itself is also
-rendered.
-
-Voxelerate defaults to an **x-ray point pass** for solid voxel previews so the denser interior is visible. This changes
-only the viewer, not the saved voxel grid.
-
 ## Output formats
 
 ### Voxel grids
