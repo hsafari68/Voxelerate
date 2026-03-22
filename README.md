@@ -5,7 +5,16 @@ It is designed for workflows where a mesh must be inspected in 3D, converted int
 accelerated with BVH or octree structures, and saved for reuse in later pipelines such as volumetric 3D printing,
 simulation, geometry processing, or analysis.
 
-> Project figure placeholder: add a hero image later at `docs/assets/hero.png` and reference it near the top of this README.
+
+## Project gallery
+
+Interactive viewer snapshots showing the input mesh, solid voxelization, mesh octree, and BVH overlays:
+
+![Voxelerate viewer panels](docs/assets/viewer_panels.png)
+
+Central solid-voxel slice inspection with voxel-octree overlay:
+
+![Voxelerate slice viewer](docs/assets/slice_viewer.png)
 
 ## Overview
 
@@ -313,10 +322,10 @@ and release tag.
 ```bibtex
 @software{voxelerate,
   title   = {Voxelerate: GPU Mesh Visualization, Voxelization, and Spatial Hierarchies for 3D Geometry},
-  author  = {Author or Research Group Name},
+  author  = {hsafari68},
   year    = {2026},
   version = {0.5.6},
-  url     = {https://github.com/<user-or-org>/voxelerate},
+  url     = {https://github.com/hsafari68/Voxelerate},
   note    = {Software repository. Cite the release or commit used in your work.}
 }
 ```
