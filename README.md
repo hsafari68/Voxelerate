@@ -196,7 +196,7 @@ plot_central_slices(
 
 ## Included models
 
-The repository intentionally ships with a small curated set of demo assets under `models/`.
+The repository ships with a small curated set of demo assets under `models/`.
 
 - `David.stl`
 - `Eiffel_Tower.stl`
@@ -205,9 +205,9 @@ The repository intentionally ships with a small curated set of demo assets under
 
 ## Examples
 
-The `examples/` folder is intentionally small and centered on the main workflows. Every example includes visualization.
+The `examples/` folder contains a few examples centered on the main visualization and voxelization workflows. 
 
-- `01_single_mesh_pipeline.py` — load `models/David.stl`, build a solid voxel grid, construct a BVH and mesh octree, visualize the mesh / grid / hierarchies, save the voxel grid, then inspect slices with a voxel-octree overlay.
+- `01_single_mesh_pipeline.py` — load `models/Eiffel_Tower.stl`, build a solid voxel grid, construct a BVH and mesh octree, visualize the mesh / grid / hierarchies, save the voxel grid, then inspect slices with a voxel-octree overlay.
 - `02_shared_grid_two_meshes.py` — voxelize two meshes on the same explicit grid defined by the larger outer mesh, visualize both results, and compare their slice plots.
 - `03_spatial_reuse.py` — save BVH and octree archives for later reuse, reload them, then visualize the reloaded structures and slice overlays.
 

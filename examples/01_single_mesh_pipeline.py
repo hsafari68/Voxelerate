@@ -12,7 +12,7 @@ from voxelerate import (
 )
 
 
-path = "models/David.stl"
+path = "models/Eiffel_Tower.stl"
 voxel_grid_path = "david_single_mesh_solid.pkl"
 
 mesh = load_mesh(path)
