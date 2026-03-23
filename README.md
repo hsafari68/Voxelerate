@@ -308,7 +308,7 @@ If you use Voxelerate in academic work, cite the software repository and the spe
   title   = {Voxelerate: GPU Mesh Visualization, Voxelization, and Spatial Hierarchies for 3D Geometry},
   author  = {hsafari68},
   year    = {2026},
-  version = {0.5.7},
+  version = {0.5.8},
   url     = {https://github.com/hsafari68/Voxelerate},
   note    = {}
 }

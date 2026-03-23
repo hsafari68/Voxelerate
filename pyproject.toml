@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "voxelerate"
-version = "0.5.7.post2"
+version = "0.5.8"
 description = "GPU mesh visualizer, voxelizer, and spatial-structure toolkit for 3D triangle meshes."
 readme = "README.md"
 license = { file = "LICENSE" }
