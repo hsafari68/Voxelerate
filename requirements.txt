@@ -1,0 +1,2 @@
+# Install Voxelerate from this repository with the recommended slice-visualization extra.
+.[viz]

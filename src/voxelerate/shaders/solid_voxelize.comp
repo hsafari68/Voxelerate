@@ -1,0 +1,118 @@
+#version 430
+
+// Portions of the voxelization logic in this shader were inspired by
+// the cuda_voxelizer project by Forceflow:
+// https://github.com/Forceflow/cuda_voxelizer
+
+
+#define EPSILON 0.0000001
+
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+layout (binding = 0) buffer TriangleData {
+    float triangle_data[];
+};
+
+layout (r32ui, binding = 1) uniform uimage3D voxel_texture;
+
+uniform vec3 unit;
+uniform vec3 bbox_min;
+uniform ivec3 grid_size;
+uniform int n_triangles;
+
+bool top_left_edge(vec2 v0, vec2 v1) {
+    return (v1.y < v0.y) || (v1.y == v0.y && v0.x > v1.x);
+}
+
+int classify_point_triangle(vec2 v0, vec2 v1, vec2 v2, vec2 point) {
+    vec2 PA = point - v0;
+    vec2 PB = point - v1;
+    vec2 PC = point - v2;
+
+    float t1 = PA.x * PB.y - PA.y * PB.x;
+    if (abs(t1) < EPSILON && PA.x * PB.x <= 0.0 && PA.y * PB.y <= 0.0) return 1;
+
+    float t2 = PB.x * PC.y - PB.y * PC.x;
+    if (abs(t2) < EPSILON && PB.x * PC.x <= 0.0 && PB.y * PC.y <= 0.0) return 2;
+
+    float t3 = PC.x * PA.y - PC.y * PA.x;
+    if (abs(t3) < EPSILON && PC.x * PA.x <= 0.0 && PC.y * PA.y <= 0.0) return 3;
+
+    if (t1 * t2 > 0.0 && t1 * t3 > 0.0) return 0;
+    return -1;
+}
+
+float x_intersection(vec3 n, vec3 v0, vec2 point_yz) {
+    return (-(n.y * (point_yz.x - v0.y) + n.z * (point_yz.y - v0.z)) / n.x + v0.x);
+}
+
+bool is_ccw(vec2 v0, vec2 v1, vec2 v2) {
+    vec2 e0 = v1 - v0;
+    vec2 e1 = v2 - v0;
+    float det = e0.x * e1.y - e1.x * e0.y;
+    return det > 0.0;
+}
+
+void main() {
+    uint thread_id = gl_GlobalInvocationID.x;
+    uint stride = gl_WorkGroupSize.x * gl_NumWorkGroups.x;
+
+    while (thread_id < uint(n_triangles)) {
+        uint t = thread_id * 9u;
+
+        vec3 v0 = vec3(triangle_data[t],     triangle_data[t + 1], triangle_data[t + 2]) - bbox_min;
+        vec3 v1 = vec3(triangle_data[t + 3], triangle_data[t + 4], triangle_data[t + 5]) - bbox_min;
+        vec3 v2 = vec3(triangle_data[t + 6], triangle_data[t + 7], triangle_data[t + 8]) - bbox_min;
+
+        vec3 e0 = v1 - v0;
+        vec3 e1 = v2 - v1;
+        vec3 n = normalize(cross(e0, e1));
+
+        if (abs(n.x) < EPSILON) {
+            thread_id += stride;
+            continue;
+        }
+
+        vec2 v0_yz = vec2(v0.y, v0.z);
+        vec2 v1_yz = vec2(v1.y, v1.z);
+        vec2 v2_yz = vec2(v2.y, v2.z);
+
+        if (!is_ccw(v0_yz, v1_yz, v2_yz)) {
+            vec2 tmp = v1_yz;
+            v1_yz = v2_yz;
+            v2_yz = tmp;
+        }
+
+        vec2 tri_bbox_min = min(v0_yz, min(v1_yz, v2_yz));
+        vec2 tri_bbox_max = max(v0_yz, max(v1_yz, v2_yz));
+
+        ivec2 yz_min = ivec2(max(vec2(0.0), ceil(tri_bbox_min / vec2(unit.y, unit.z) - 0.5)));
+        ivec2 yz_max = ivec2(min(vec2(grid_size.y - 1, grid_size.z - 1), floor(tri_bbox_max / vec2(unit.y, unit.z) - 0.5)));
+
+        for (int y = yz_min.x; y <= yz_max.x; ++y) {
+            for (int z = yz_min.y; z <= yz_max.y; ++z) {
+                vec2 point = vec2((y + 0.5) * unit.y, (z + 0.5) * unit.z);
+                int hit = classify_point_triangle(v0_yz, v1_yz, v2_yz, point);
+
+                bool inside =
+                    (hit == 1 && top_left_edge(v0_yz, v1_yz)) ||
+                    (hit == 2 && top_left_edge(v1_yz, v2_yz)) ||
+                    (hit == 3 && top_left_edge(v2_yz, v0_yz)) ||
+                    (hit == 0);
+
+                if (!inside) {
+                    continue;
+                }
+
+                int x_max = int(floor(x_intersection(n, v0, point) / unit.x - 0.5));
+                x_max = clamp(x_max, 0, grid_size.x - 1);
+
+                for (int x = 0; x <= x_max; ++x) {
+                    imageAtomicXor(voxel_texture, ivec3(x, y, z), 1u);
+                }
+            }
+        }
+
+        thread_id += stride;
+    }
+}
