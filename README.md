@@ -1,6 +1,6 @@
 # Voxelerate
 
-**Voxelerate** is a GPU-first toolkit for loading, visualizing, voxelizing, and serializing 3D triangle meshes.  
+**Voxelerate** is a GPU-accelerated toolkit for loading, visualizing, voxelizing, and serializing 3D triangle meshes.  
 It is designed for workflows where a mesh must be inspected in 3D, converted into a dense voxel volume, optionally accelerated with BVH or octree structures, and saved for reuse in later pipelines such as volumetric 3D printing, simulation, geometry processing, or analysis.
 
 ## Gallery
@@ -42,22 +42,38 @@ A core design rule in Voxelerate is that viewer interaction is **preview-only**.
 
 ## Installation
 
-Recommended installation from the repository root:
+Install from **PyPI** (recommended):
+
+```bash
+pip install voxelerate
+```
+
+On **Windows**, the equivalent command is:
+
+```bat
+py -m pip install voxelerate
+```
+
+Optional extras:
+
+```bash
+pip install "voxelerate[open3d]"
+pip install "voxelerate[dev]"
+```
+
+Install from the **repository source**:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The included `requirements.txt` installs Voxelerate with the recommended slice-visualization extra.
-
-Alternative installation options:
+Editable source install:
 
 ```bash
-pip install .
 pip install -e .
-pip install -e ".[open3d]"
-pip install -e ".[dev]"
 ```
+
+If the `voxelerate` command is not recognized on Windows after installation, add your Python `Scripts` directory to `PATH`.
 
 ## Runtime requirements
 
@@ -80,7 +96,7 @@ These conventions are explicit throughout the repository.
 ```python
 from voxelerate import build_voxel_octree, load_mesh, plot_central_slices, show, voxelize
 
-mesh = load_mesh("models/Eiffel_Tower.stl")
+mesh = load_mesh("path/to/your_mesh.stl")
 voxel_grid = voxelize(
     mesh,
     voxel_size=0.25,
@@ -98,10 +114,10 @@ plot_central_slices(
     voxel_grid,
     octree=voxel_octree,
     max_depth=5,
-    title="Eiffel Tower - central slices",
+    title="Mesh - central slices",
 )
 
-voxel_grid.save_pickle("eiffel_tower_solid.pkl", format="hybrid")
+voxel_grid.save_pickle("mesh_solid.pkl", format="hybrid")
 ```
 
 ## Interactive viewer
@@ -177,7 +193,7 @@ Example:
 ```python
 from voxelerate import build_voxel_octree, load_voxel_grid, plot_central_slices
 
-grid = load_voxel_grid("eiffel_tower_solid.pkl")
+grid = load_voxel_grid("mesh_solid.pkl")
 octree = build_voxel_octree(grid, max_depth=8)
 
 plot_central_slices(
@@ -190,7 +206,7 @@ plot_central_slices(
 
 ## Included models
 
-The repository ships with a small curated set of demo assets under `models/`.
+The GitHub repository ships with a small curated set of demo assets under `models/`. These assets are intended for the repository examples and are not part of the runtime wheel installed from PyPI.
 
 - `David.stl`
 - `Eiffel_Tower.stl`
@@ -199,7 +215,7 @@ The repository ships with a small curated set of demo assets under `models/`.
 
 ## Examples
 
-The `examples/` folder contains a few examples centered on the main visualization and voxelization workflows. 
+The GitHub repository includes a small curated `examples/` folder centered on the main visualization and voxelization workflows. If you install Voxelerate from PyPI, clone or download the repository to run these example scripts with the bundled demo assets. 
 
 - `01_single_mesh_pipeline.py` — load `models/Eiffel_Tower.stl`, build a solid voxel grid, construct a BVH and mesh octree, visualize the mesh / grid / hierarchies, save the voxel grid, then inspect slices with a voxel-octree overlay.
 - `02_shared_grid_two_meshes.py` — voxelize two meshes on the same explicit grid defined by the larger outer mesh, visualize both results, and compare their slice plots.
@@ -212,43 +228,43 @@ See `examples/README.md` for the curated example workflows and run instructions.
 Open a mesh viewer:
 
 ```bash
-voxelerate view models/Eiffel_Tower.stl
+voxelerate view path/to/mesh.stl
 ```
 
 Voxelize a mesh using automatic bounds:
 
 ```bash
-voxelerate voxelize models/Eiffel_Tower.stl   --voxel-size 0.25   --mode solid   --pixel-size 0.015   --output eiffel_tower_solid.pkl
+voxelerate voxelize path/to/mesh.stl   --voxel-size 0.25   --mode solid   --pixel-size 0.015   --output mesh_solid.pkl
 ```
 
 Voxelize with explicit transform vectors:
 
 ```bash
-voxelerate voxelize models/David.stl   --voxel-size 0.5   --translate 0.0 0.0 0.0   --rotate 0.0 25.0 0.0   --scale 1.0   --mode surface   --output david_surface_transformed.pkl
+voxelerate voxelize path/to/mesh.stl   --voxel-size 0.5   --translate 0.0 0.0 0.0   --rotate 0.0 25.0 0.0   --scale 1.0   --mode surface   --output mesh_surface_transformed.pkl
 ```
 
 Voxelize on an explicit grid:
 
 ```bash
-voxelerate voxelize models/C12.STL   --grid-size 267 223 267   --bounds-min 0 0 0   --bounds-max 12 10 12   --mode solid   --output c12_shared_grid.pkl
+voxelerate voxelize path/to/mesh.stl   --grid-size 267 223 267   --bounds-min 0 0 0   --bounds-max 12 10 12   --mode solid   --output mesh_shared_grid.pkl
 ```
 
 Inspect slices from a saved voxel grid:
 
 ```bash
-voxelerate slices eiffel_tower_solid.pkl --show-octree
+voxelerate slices mesh_solid.pkl --show-octree
 ```
 
 Build and save a BVH:
 
 ```bash
-voxelerate bvh models/David.stl --strategy median --max-leaf-size 8 --save david.bvh.npz
+voxelerate bvh path/to/mesh.stl --strategy median --max-leaf-size 8 --save mesh.bvh.npz
 ```
 
 Build and save a voxel octree:
 
 ```bash
-voxelerate octree eiffel_tower_solid.pkl --max-depth 8 --save eiffel_tower_octree.npz
+voxelerate octree mesh_solid.pkl --max-depth 8 --save mesh_octree.npz
 ```
 
 ## Notes for large meshes

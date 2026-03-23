@@ -9,34 +9,51 @@ description = "GPU mesh visualizer, voxelizer, and spatial-structure toolkit for
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
-keywords = ["mesh", "voxelization", "OpenGL", "visualization", "BVH", "octree", "3D"]
+authors = [
+  { name = "hsafari68" }
+]
+keywords = [
+  "mesh",
+  "voxelization",
+  "OpenGL",
+  "visualization",
+  "BVH",
+  "octree",
+  "3D"
+]
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "Topic :: Multimedia :: Graphics :: 3D Rendering",
-    "Topic :: Scientific/Engineering :: Visualization",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Operating System :: OS Independent",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Topic :: Multimedia :: Graphics :: 3D Rendering",
+  "Topic :: Scientific/Engineering :: Visualization",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: Microsoft :: Windows"
 ]
 dependencies = [
-    "numpy>=1.24",
-    "glfw>=2.6",
-    "PyOpenGL>=3.1.7",
+  "numpy>=1.24",
+  "glfw>=2.6",
+  "PyOpenGL>=3.1.7",
+  "matplotlib>=3.8"
 ]
 
 [project.optional-dependencies]
-open3d = [
-    "open3d>=0.18",
-]
-viz = [
-    "matplotlib>=3.8",
-]
+open3d = ["open3d>=0.18"]
 dev = [
-    "pytest>=8.0",
-    "ruff>=0.4",
+  "pytest>=8.0",
+  "ruff>=0.4",
+  "build>=1.2",
+  "twine>=5.0"
 ]
+
+[project.urls]
+Homepage = "https://github.com/hsafari68/Voxelerate"
+Repository = "https://github.com/hsafari68/Voxelerate"
+Issues = "https://github.com/hsafari68/Voxelerate/issues"
 
 [project.scripts]
 voxelerate = "voxelerate.cli:main"

@@ -1,2 +1,2 @@
-# Install Voxelerate from this repository with the recommended slice-visualization extra.
-.[viz]
+# Install Voxelerate from this repository with the default runtime dependencies.
+.
