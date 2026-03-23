@@ -310,7 +310,7 @@ If you use Voxelerate in academic work, cite the software repository and the spe
   year    = {2026},
   version = {0.5.7},
   url     = {https://github.com/hsafari68/Voxelerate},
-  note    = {Software repository. Cite the release or commit used in your work.}
+  note    = {}
 }
 ```
 
