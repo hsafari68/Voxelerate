@@ -13,7 +13,7 @@ from voxelerate import (
 
 
 path = "models/Eiffel_Tower.stl"
-voxel_grid_path = "david_single_mesh_solid.pkl"
+voxel_grid_path = "eiffel_tower_single_mesh_solid.pkl"
 
 mesh = load_mesh(path)
 grid = voxelize(mesh, voxel_size=0.25, mode="solid", pixel_size=0.015)
@@ -32,7 +32,7 @@ show(
     voxel_grid=grid,
     bvh=bvh,
     octree=mesh_octree,
-    title="Voxelerate Viewer | single mesh pipeline | David",
+    title="Voxelerate Viewer | single mesh pipeline | Eiffel_Tower",
 )
 
 reloaded_grid = load_voxel_grid(voxel_grid_path)
@@ -41,5 +41,5 @@ plot_central_slices(
     reloaded_grid,
     octree=voxel_octree,
     max_depth=5,
-    title="Single mesh | David | central solid voxel slices",
+    title="Single mesh | Eiffel_Tower | central solid voxel slices",
 )
