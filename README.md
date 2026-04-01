@@ -304,7 +304,7 @@ Voxelerate/
 If you use Voxelerate in academic work, cite the software repository and the specific release or commit you used.
 
 ```bibtex
-@software{Safari2026Voxelerate,
+@software{Voxelerate,
   author    = {Safari, Hossein},
   title     = {Voxelerate: GPU-Accelerated Mesh Visualization, Voxelization, and Spatial Hierarchies for 3D Geometry},
   year      = {2026},
