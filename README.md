@@ -304,13 +304,14 @@ Voxelerate/
 If you use Voxelerate in academic work, cite the software repository and the specific release or commit you used.
 
 ```bibtex
-@software{voxelerate,
-  title   = {Voxelerate: GPU Mesh Visualization, Voxelization, and Spatial Hierarchies for 3D Geometry},
-  author  = {hsafari68},
-  year    = {2026},
-  version = {0.5.8},
-  url     = {https://github.com/hsafari68/Voxelerate},
-  note    = {}
+@software{Safari2026Voxelerate,
+  author    = {Safari, Hossein},
+  title     = {Voxelerate: GPU-Accelerated Mesh Visualization, Voxelization, and Spatial Hierarchies for 3D Geometry},
+  year      = {2026},
+  version   = {0.5.8},
+  publisher = {Technical University of Denmark},
+  doi       = {10.11583/DTU.31879711},
+  url       = {https://doi.org/10.11583/DTU.31879711}
 }
 ```
 
